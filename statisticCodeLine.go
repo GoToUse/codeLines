@@ -42,10 +42,10 @@ func main() {
 	flag.Var(&excludeDirs, "e", "Exclude directories.")
 	flag.Parse()
 
-	absPath, _ := filepath.Abs(rootPath)
-	fmt.Println("root Path:", absPath)
+	rootPath, _ := convertToAbsPath(rootPath)
+	fmt.Println("root Path:", rootPath)
 	fmt.Println("Suffix name:", suffixName)
-	fmt.Println("Exclude Dirs:", excludeDirs)
+	fmt.Printf("Exclude Dirs: %s\n\n", excludeDirs)
 	title := fmt.Sprintf("%s |%s"+"|%-15s"+"|%s\n", "type", "file-name", "status", "line-nums")
 	storeFormatOut = append(storeFormatOut, title)
 
@@ -64,6 +64,14 @@ func main() {
 	fmt.Println(strings.Repeat("-", length))
 	fmt.Println("Total files: ", fileTotal)
 	fmt.Println("Total lines: ", lineSum)
+}
+
+func convertToAbsPath(root string) (path string, err error) {
+	if root == "." || root == "./" {
+		path, err = filepath.Abs(root)
+		return path, err
+	}
+	return root, nil
 }
 
 func codeLineSum(root string, done chan bool) {
@@ -124,6 +132,8 @@ func codeLineSum(root string, done chan bool) {
 
 func readFile(fileName string, done chan bool) {
 	var line int
+	rootPath, err := convertToAbsPath(rootPath)
+	checkErr(err)
 
 	isDstFile := strings.HasSuffix(fileName, suffixName)
 	defer func() {
@@ -135,7 +145,7 @@ func readFile(fileName string, done chan bool) {
 			addLineNum(line)
 			relativePath := strings.Split(fileName, rootPath)[1]
 			relativePathArr = append(relativePathArr, relativePath)
-			rline := fmt.Sprintf("file |.%s"+"|%-15s"+"|line = %d\n", relativePath, "complete", line)
+			rline := fmt.Sprintf("file |%s"+"|%-15s"+"|line = %d\n", relativePath, "complete", line)
 			storeFormatOut = append(storeFormatOut, rline)
 		}
 
@@ -230,7 +240,7 @@ func formatOutput(storeOutStr []string, space int, suffixName string) (int, []st
 	restStoreOutStr := newStoreOutStr[2:]
 
 	for i := 0; i < len(restStoreOutStr); i++ {
-		re, _ := regexp.Compile("./(.*?)" + suffixName)
+		re, _ := regexp.Compile("/(.*?)" + suffixName)
 		filePath := re.FindString(restStoreOutStr[i])
 		lineNum, _ := strconv.Atoi(strings.TrimSpace(strings.Split(restStoreOutStr[i], "line =")[1]))
 		restStoreOutStr[i] = strings.TrimRight(formatLine(space, filePath, lineNum), "\n")
