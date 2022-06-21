@@ -176,6 +176,8 @@ func readFile(fileName string, done chan bool) {
 }
 
 func checkDir(dirPath string) bool {
+	rootPath, err := convertToAbsPath(rootPath)
+	checkErr(err)
 	for _, dir := range excludeDirs {
 		if path.Join(rootPath, dir) == path.Join(dirPath) {
 			return false
