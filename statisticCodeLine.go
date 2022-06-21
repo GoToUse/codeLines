@@ -240,7 +240,7 @@ func formatOutput(storeOutStr []string, space int, suffixName string) (int, []st
 	restStoreOutStr := newStoreOutStr[2:]
 
 	for i := 0; i < len(restStoreOutStr); i++ {
-		re, _ := regexp.Compile("/(.*?)" + suffixName)
+		re, _ := regexp.Compile("/(.*?)\\" + suffixName)
 		filePath := re.FindString(restStoreOutStr[i])
 		lineNum, _ := strconv.Atoi(strings.TrimSpace(strings.Split(restStoreOutStr[i], "line =")[1]))
 		restStoreOutStr[i] = strings.TrimRight(formatLine(space, filePath, lineNum), "\n")
