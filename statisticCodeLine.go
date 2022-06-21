@@ -67,11 +67,8 @@ func main() {
 }
 
 func convertToAbsPath(root string) (path string, err error) {
-	if root == "." || root == "./" {
-		path, err = filepath.Abs(root)
-		return path, err
-	}
-	return root, nil
+	path, err = filepath.Abs(root)
+	return path, err
 }
 
 func codeLineSum(root string, done chan bool) {
