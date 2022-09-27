@@ -1,4 +1,4 @@
-module github.com/Abeautifulsnow/codeLines
+module github.com/GoToUse/codeLines
 
 go 1.18
 
