@@ -53,34 +53,34 @@ root Path: /Users/dapeng/.virtualenvs/py310/lib/python3.10/site-packages/django/
 Suffix name: .py
 Exclude Dirs: [migrations]
 
-type |file-name                               |status         |line-nums
-------------------------------------------------------------------------
-file |/decorators.py                          |complete       |line = 111
-file |/sites.py                               |complete       |line = 606
-file |/tests.py                               |complete       |line = 234
-file |/options.py                             |complete       |line = 2506
-file |/__init__.py                            |complete       |line = 50
-file |/models.py                              |complete       |line = 190
-file |/utils.py                               |complete       |line = 578
-file |/actions.py                             |complete       |line = 96
-file |/views/__init__.py                      |complete       |line = 0
-file |/templatetags/admin_urls.py             |complete       |line = 66
-file |/helpers.py                             |complete       |line = 560
-file |/templatetags/admin_list.py             |complete       |line = 533
-file |/exceptions.py                          |complete       |line = 13
-file |/templatetags/log.py                    |complete       |line = 69
-file |/views/decorators.py                    |complete       |line = 19
-file |/templatetags/__init__.py               |complete       |line = 0
-file |/filters.py                             |complete       |line = 550
-file |/checks.py                              |complete       |line = 1350
-file |/apps.py                                |complete       |line = 27
-file |/templatetags/base.py                   |complete       |line = 45
-file |/templatetags/admin_modify.py           |complete       |line = 150
-file |/views/autocomplete.py                  |complete       |line = 122
-file |/widgets.py                             |complete       |line = 587
-file |/forms.py                               |complete       |line = 31
-file |/views/main.py                          |complete       |line = 585
-------------------------------------------------------------------------
-Total files:  25
-Total lines:  9078
+type |file-name                               |status         |line[blank]    |line[code]
+-----------------------------------------------------------------------------------------
+file |models.py                               |complete       |blank = 22     |line = 168
+file |__init__.py                             |complete       |blank = 3      |line = 47
+file |widgets.py                              |complete       |blank = 92     |line = 495
+file |apps.py                                 |complete       |blank = 8      |line = 19
+file |checks.py                               |complete       |blank = 115    |line = 1235
+file |forms.py                                |complete       |blank = 6      |line = 25
+file |templatetags/admin_urls.py              |complete       |blank = 17     |line = 49
+file |tests.py                                |complete       |blank = 38     |line = 196
+file |templatetags/__init__.py                |complete       |blank = 0      |line = 0
+file |actions.py                              |complete       |blank = 12     |line = 84
+file |utils.py                                |complete       |blank = 77     |line = 501
+file |sites.py                                |complete       |blank = 98     |line = 508
+file |views/__init__.py                       |complete       |blank = 0      |line = 0
+file |options.py                              |complete       |blank = 274    |line = 2232
+file |templatetags/admin_modify.py            |complete       |blank = 17     |line = 133
+file |views/decorators.py                     |complete       |blank = 2      |line = 17
+file |templatetags/base.py                    |complete       |blank = 5      |line = 40
+file |templatetags/log.py                     |complete       |blank = 12     |line = 57
+file |templatetags/admin_list.py              |complete       |blank = 60     |line = 473
+file |helpers.py                              |complete       |blank = 68     |line = 492
+file |views/autocomplete.py                   |complete       |blank = 18     |line = 104
+file |exceptions.py                           |complete       |blank = 6      |line = 7
+file |filters.py                              |complete       |blank = 70     |line = 480
+file |decorators.py                           |complete       |blank = 23     |line = 88
+file |views/main.py                           |complete       |blank = 42     |line = 543
+-----------------------------------------------------------------------------------------
+Summary: total files: 25 blanks: 1085 codes: 7993
+
 ```
