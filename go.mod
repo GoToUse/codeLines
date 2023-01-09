@@ -1,6 +1,6 @@
 module github.com/GoToUse/codeLines
 
-go 1.18
+go 1.19
 
 require (
 	github.com/gdamore/encoding v1.0.0 // indirect
