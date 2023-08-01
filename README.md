@@ -90,3 +90,4 @@ Summary: total files: 25 blanks: 1085 codes: 7993
 
 - Perl - [cloc](https://github.com/AlDanial/cloc) - cloc counts blank lines, comment lines, and physical lines of source code in many programming languages.
 - rust - [loc](https://github.com/cgag/loc) - Count lines of code quickly.
+- go - [gocloc](https://github.com/hhatto/gocloc) - A little fast cloc(Count Lines Of Code)
