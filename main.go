@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/gob"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -35,8 +36,8 @@ var (
 
 // go flag variables
 var (
-	rootPath    string // root path of directory
-	excludeDirs excludeDirArray
+	rootPath    string          // root path of directory
+	excludeDirs excludeDirArray // Multiple -e flags or string seperated by commas or spaces are supported
 	suffixName  string
 )
 
@@ -47,14 +48,33 @@ func (e *excludeDirArray) String() string {
 }
 
 func (e *excludeDirArray) Set(value string) error {
-	*e = append(*e, value)
-	return nil
+	commaRegex := regexp.MustCompile(`,`)
+	commaMatched := commaRegex.MatchString(value)
+
+	spaceRegex := regexp.MustCompile(`\s`)
+	spaceMatched := spaceRegex.MatchString(value)
+
+	switch {
+	case commaMatched && spaceMatched:
+		return errors.New("spaces and commas cannot be included at the same time, there is only one type: `spaces` or `commas`")
+	case commaMatched && !spaceMatched:
+		commas := strings.Split(value, ",")
+		*e = commas
+		return nil
+	case spaceMatched && !commaMatched:
+		spaces := strings.Split(value, " ")
+		*e = spaces
+		return nil
+	default:
+		*e = append(*e, value)
+		return nil
+	}
 }
 
 func init() {
 	flag.StringVar(&rootPath, "p", ".", "Root path.")
 	flag.StringVar(&suffixName, "s", `.go`, "Suffix name of file, starts with `.`; Such as `.go`")
-	flag.Var(&excludeDirs, "e", "Exclude directories.")
+	flag.Var(&excludeDirs, "e", "Exclude directories, Multiple -e flags or string seperated by commas or spaces are supported.")
 	flag.Parse()
 }
 
@@ -77,17 +97,23 @@ func main() {
 		rSpace = space
 	}
 	length, newOut := formatOutput(storeFormatOut, rSpace, suffixName)
-	for _, v := range newOut {
-		fmt.Println(v)
-	}
 
-	fmt.Println(strings.Repeat("-", length))
-	fmt.Println(
-		// https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences/33206814#33206814
-		fmt.Sprintf(
-			"\033[1mSummary:\033[0m total files: \033[31m%d\033[0m blanks: \033[32m%d\033[0m codes: \033[33m%d\033[0m",
-			fileTotal, blankSum, lineSum),
-	)
+	if len(newOut) == 2 {
+		/* Only this two lines
+		type |file-name                               |status         |line[blank]    |line[code]
+		-----------------------------------------------------------------------------------------
+		Do nothing.
+		*/
+	} else {
+		for _, v := range newOut {
+			fmt.Println(v)
+		}
+
+		fmt.Println(strings.Repeat("-", length))
+	}
+	// https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences/33206814#33206814
+	fmt.Printf("\033[1mSummary:\033[0m total files: \033[31m%d\033[0m blanks: \033[32m%d\033[0m codes: \033[33m%d\033[0m\n",
+		fileTotal, blankSum, lineSum)
 }
 
 func convertToAbsPath(root string) (path string, err error) {
@@ -238,6 +264,10 @@ func getMaximumLinesNumber(lineArr []string) int {
 	for i := 0; i < len(lineArr); i++ {
 		nums = append(nums, len(lineArr[i]))
 	}
+
+	if len(nums) == 0 {
+		return 0
+	}
 	maxNum := getMaxNumber(nums)
 
 	return maxNum
@@ -287,8 +317,8 @@ func formatOutput(storeOutStr []string, space int, suffixName string) (int, []st
 
 		content := restStoreOutStr[i]
 		filePath := re.FindString(content)
-		blankCompile := regexp.MustCompile("blank = \\d+")
-		lineCompile := regexp.MustCompile("line = \\d+")
+		blankCompile := regexp.MustCompile(`blank = \\d+`)
+		lineCompile := regexp.MustCompile(`line = \\d+`)
 
 		lineNum, err := strconv.Atoi(trimStringSpace(strings.Split(lineCompile.FindString(content), "=")[1], false))
 		checkErr(err)
@@ -296,9 +326,7 @@ func formatOutput(storeOutStr []string, space int, suffixName string) (int, []st
 		blankNum, err := strconv.Atoi(trimStringSpace(strings.Split(blankCompile.FindString(content), "=")[1], false))
 		checkErr(err)
 
-		if strings.HasPrefix(filePath, "/") {
-			filePath = filePath[1:]
-		}
+		filePath = strings.TrimPrefix(filePath, "/")
 		restStoreOutStr[i] = strings.TrimRight(formatLine(space, filePath, lineNum, blankNum), "\n")
 	}
 
@@ -310,7 +338,7 @@ func getByteSlice() []byte {
 }
 
 func putByteSlice(bs []byte) {
-	bsPool.Put(bs)
+	bsPool.Put(&bs)
 }
 
 // deepCopy
