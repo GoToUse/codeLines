@@ -89,5 +89,8 @@ Summary: total files: 25 blanks: 1085 codes: 7993
 ## 其他更为完善的工具
 
 - Perl - [cloc](https://github.com/AlDanial/cloc) - cloc counts blank lines, comment lines, and physical lines of source code in many programming languages.
-- rust - [loc](https://github.com/cgag/loc) - Count lines of code quickly.
-- go - [gocloc](https://github.com/hhatto/gocloc) - A little fast cloc(Count Lines Of Code)
+- rust - [loc](https://github.com/cgag/loc) - Count lines of code quickly. rust implementation similar to tokei but often faster.
+- go - [gocloc](https://github.com/hhatto/gocloc) - A little fast cloc(Count Lines Of Code) inspired by tokei.
+- go - [gcloc](https://github.com/JoaoDanielRufino/gcloc) - CLI tool to count lines of code(Support counting the amount of code on git).
+- go - [scc](https://github.com/boyter/scc/) - Sloc, Cloc and Code: scc is a very fast accurate code counter with complexity calculations and COCOMO estimates written in pure Go.
+- rust - [tokei](https://github.com/XAMPPRocky/tokei) - Count your code, quickly.
