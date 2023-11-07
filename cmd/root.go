@@ -20,6 +20,7 @@ func Execute() {
 	}
 }
 
+// Register one or more commands to root command.
 func init() {
-	rootCmd.AddCommand(singleLanguageCmd)
+	rootCmd.AddCommand(singleLanguageCmd, multipleLanguageCmd)
 }
