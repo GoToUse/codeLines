@@ -317,8 +317,8 @@ func formatOutput(storeOutStr []string, space int, suffixName string) (int, []st
 
 		content := restStoreOutStr[i]
 		filePath := re.FindString(content)
-		blankCompile := regexp.MustCompile(`blank = \\d+`)
-		lineCompile := regexp.MustCompile(`line = \\d+`)
+		blankCompile := regexp.MustCompile(`blank = (\d+)`)
+		lineCompile := regexp.MustCompile(`line = (\d+)`)
 
 		lineNum, err := strconv.Atoi(trimStringSpace(strings.Split(lineCompile.FindString(content), "=")[1], false))
 		checkErr(err)
@@ -338,7 +338,7 @@ func getByteSlice() []byte {
 }
 
 func putByteSlice(bs []byte) {
-	bsPool.Put(&bs)
+	bsPool.Put(bs)
 }
 
 // deepCopy
