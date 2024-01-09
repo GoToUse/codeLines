@@ -14,13 +14,14 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 )
 
 // go variables
 var (
-	fileTotal       int
-	lineSum         int
-	blankSum        int
+	fileTotal       int32
+	lineSum         int32
+	blankSum        int32
 	mutex           = new(sync.Mutex)
 	storeFormatOut  []string
 	relativePathArr []string
@@ -42,6 +43,11 @@ var (
 )
 
 type excludeDirArray []string
+
+// Number is a generic type for parameters.
+type Number interface {
+	int64 | int32 | int16 | int8 | int
+}
 
 func (e *excludeDirArray) String() string {
 	return fmt.Sprint(*e)
@@ -163,7 +169,7 @@ func codeLineSum(root string, done chan bool) {
 			if strings.HasPrefix(fi.Name(), ".") {
 				continue
 			}
-			goes++
+			addNumWithLock(1, &goes)
 
 			if fi.IsDir() {
 				go codeLineSum(path.Join(root, fi.Name()), goDone)
@@ -178,7 +184,7 @@ func codeLineSum(root string, done chan bool) {
 }
 
 func readFile(fileName string, done chan bool) {
-	var line, blank int
+	var line, blank int32
 	rootPath, err := convertToAbsPath(rootPath)
 	checkErr(err)
 
@@ -205,7 +211,7 @@ func readFile(fileName string, done chan bool) {
 		return
 	}
 
-	fileTotal++
+	atomic.AddInt32(&fileTotal, 1)
 	file, err := os.Open(fileName)
 	checkErr(err)
 	defer func(file *os.File) {
@@ -227,10 +233,10 @@ func readFile(fileName string, done chan bool) {
 
 		if lineOrgLen == 0 {
 			// blank lines
-			blank++
+			atomic.AddInt32(&blank, 1)
 		} else {
 			// codes and comments
-			line++
+			atomic.AddInt32(&line, 1)
 		}
 	}
 }
@@ -246,7 +252,7 @@ func excludeDir(dirPath string) bool {
 }
 
 // addNumWithLock Adds `num` to `*sumVar` with Lock
-func addNumWithLock(num int, sumVar *int) {
+func addNumWithLock[T Number](num T, sumVar *T) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -285,22 +291,22 @@ func getMaxNumber(arr []int) int {
 	return maxVal
 }
 
-func formatTitle(space int) string {
+func formatTitle[T Number](space T) string {
 	title := fmt.Sprintf(
-		"%s |%-"+strconv.Itoa(space)+"s"+"|%-"+strconv.Itoa(statusWidth)+"s"+"|%-"+strconv.Itoa(numberWidth)+"s"+"|%s\n",
+		"%s |%-"+strconv.Itoa(int(space))+"s"+"|%-"+strconv.Itoa(statusWidth)+"s"+"|%-"+strconv.Itoa(numberWidth)+"s"+"|%s\n",
 		"type", "file-name", "status", "line[blank]", "line[code]")
 	return title
 }
 
-func formatLine(space int, relativePath string, line, blank int) string {
+func formatLine[T Number](space T, relativePath string, line, blank T) string {
 	rLine := fmt.Sprintf(
-		"file |%-"+strconv.Itoa(space)+"s"+"|%-"+strconv.Itoa(statusWidth)+"s"+"|%-"+strconv.Itoa(numberWidth)+"s"+"|line = %d\n",
+		"file |%-"+strconv.Itoa(int(space))+"s"+"|%-"+strconv.Itoa(statusWidth)+"s"+"|%-"+strconv.Itoa(numberWidth)+"s"+"|line = %d\n",
 		relativePath, "complete", fmt.Sprintf("blank = %d", blank), line)
 	return rLine
 }
 
 // formatOutput format the output contents.
-func formatOutput(storeOutStr []string, space int, suffixName string) (int, []string) {
+func formatOutput[T Number](storeOutStr []string, space T, suffixName string) (T, []string) {
 	var newStoreOutStr *[]string
 	err := deepCopy(&newStoreOutStr, storeOutStr)
 	checkErr(err)
@@ -327,10 +333,10 @@ func formatOutput(storeOutStr []string, space int, suffixName string) (int, []st
 		checkErr(err)
 
 		filePath = strings.TrimPrefix(filePath, "/")
-		restStoreOutStr[i] = strings.TrimRight(formatLine(space, filePath, lineNum, blankNum), "\n")
+		restStoreOutStr[i] = strings.TrimRight(formatLine(space, filePath, T(lineNum), T(blankNum)), "\n")
 	}
 
-	return maxLength, *newStoreOutStr
+	return T(maxLength), *newStoreOutStr
 }
 
 func getByteSlice() []byte {
